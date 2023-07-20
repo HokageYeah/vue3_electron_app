@@ -53,7 +53,7 @@ const setFilePath = (filePath?: string) => {
 }
 const getData = async () => {
   try {
-    const response = await axios.get('../../static/hostAddress.json') // 发送 GET 请求获取 JSON 数据
+    const response = await axios.get('/hostAddress.json') // 发送 GET 请求获取 JSON 数据
     debugger
     console.log(response);
   } catch (error) {
