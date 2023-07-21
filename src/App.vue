@@ -11,7 +11,8 @@ import HelloWorld from './components/HelloWorld.vue'
       <nav>
         <RouterLink to="/">Hom111e</RouterLink>
         <RouterLink to="/about">About</RouterLink>
-        <RouterLink to="/changeHost">changeHost</RouterLink>
+        <RouterLink to="/change-host">changeHost</RouterLink>
+        <RouterLink to="/down-load-host-list">downLoadHost</RouterLink>
       </nav>
     </div>
   </header>
