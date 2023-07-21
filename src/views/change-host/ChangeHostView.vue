@@ -28,6 +28,7 @@ defineOptions({ name: 'ChangeHostView' })
 
 const dialogUrl = ref('')
 let clickindex = 0
+let jsonObj: any = {}
 
 const tableData: Ref<dataItemType[]> = ref([])
 const dialogVisible = ref(false)
@@ -55,9 +56,9 @@ const getData = async () => {
 onMounted(() => {
   fileReadSync()
     .then((fileData: string) => {
-      const jsonObj = JSON.parse(fileData)
+      jsonObj = JSON.parse(fileData)
       // 在这里处理文件内容
-      const result = Object.entries(jsonObj).map(([name, url]) => ({ name, url })) as dataItemType[]
+      const result = Object.entries(jsonObj.url).map(([name, url]) => ({ name, url })) as dataItemType[]
       tableData.value = result
     })
     .catch((err) => {
@@ -72,7 +73,8 @@ const clickSure = (url: string) => {
   tableData.value.forEach((item) => {
     transformedData[item.name] = item.url
   })
-  fileWriteSync(transformedData)
+  jsonObj.url = transformedData
+  fileWriteSync(jsonObj)
     .then((str: string) => {
       ElMessage({
         message: str,

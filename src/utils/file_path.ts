@@ -1,7 +1,15 @@
 const path = require('node:path')
 const fs = require('node:fs')
+const os = require('os')
 
-const userDirectory = process.env.HOME || process.env.USERPROFILE // 获取用户盘的路径
+/** 
+process.env.HOME是 Linux 和 macOS 系统中用于表示用户主目录的环境变量，而在 Windows 上应使用 process.env.USERPROFILE 来获取用户主目录路径。
+然而，尽管process.env.USERPROFILE是正确的变量，但在使用 Electron 框架打包后，默认情况下不再具有这样的环境变量。因此，你需要使用其他方法来获取用户主目录路径。
+你可以尝试使用 Node.js 的 os 模块来获取用户主目录路径，
+*/
+const userDirectory = process.env.HOME || process.env.USERPROFILE || os.homedir() // 获取用户盘的路径
+console.log('userDirectory-------', userDirectory)
+
 const filePath = path.join(userDirectory!, 'chh')
 const filePathAddress = path.join(filePath, 'hostAddress.json')
 debugger
@@ -41,4 +49,3 @@ type dataItemType = {
 
 export { userDirectory, filePath, filePathAddress, fileReadSync, fileWriteSync }
 export type { dataItemType }
-

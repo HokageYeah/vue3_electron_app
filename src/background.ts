@@ -32,11 +32,14 @@ const readOrCreateFile = (filePath: any) => {
     }
     const filePathAddress = path.join(filePath, 'hostAddress.json')
     const fileContent = {
-      test: '',
-      staging: '',
-      prod: '',
-      'old-bak': '',
-      dev: ''
+      url: {
+        test: '',
+        staging: '',
+        prod: '',
+        'old-bak': '',
+        dev: ''
+      },
+      current: ''
     }
     fs.readFile(filePathAddress, 'utf8', (err, data) => {
       if (err) {
