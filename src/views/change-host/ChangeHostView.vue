@@ -20,15 +20,11 @@
 
 <script setup lang="ts">
 import { ref, onMounted, type Ref } from 'vue'
-import { fileReadSync, fileWriteSync } from '@/utils/file_path'
+import { fileReadSync, fileWriteSync, type dataItemType } from '@/utils/file_path'
 import HostEditDialog from './components/HostEditDialog.vue'
-
 import axios from 'axios'
+defineOptions({ name: 'ChangeHostView' })
 
-type dataItemType = {
-  name: string
-  url: string
-}
 
 const dialogUrl = ref('')
 let clickindex = 0
@@ -89,6 +85,5 @@ const clickSure = (url: string) => {
   console.log(tableData.value)
 }
 
-defineOptions({ name: 'ChangeHostView' })
 </script>
 <style scoped lang="scss"></style>

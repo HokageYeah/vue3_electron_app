@@ -34,4 +34,11 @@ const fileWriteSync = (data: any) => {
   })
 }
 
+type dataItemType = {
+  name: string
+  url: string
+}
+
 export { userDirectory, filePath, filePathAddress, fileReadSync, fileWriteSync }
+export type { dataItemType }
+
