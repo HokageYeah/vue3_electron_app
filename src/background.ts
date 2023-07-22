@@ -65,7 +65,19 @@ const readOrCreateFile = (filePath: any) => {
     })
   })
 }
-
+const checkAndCreateHostsFolder = (hostsFolderPath: string) => {
+  try {
+    // 判断文件夹是否存在
+    const stats = fs.statSync(hostsFolderPath)
+    if (stats.isDirectory()) {
+      console.log('Hosts文件夹已存在')
+    }
+  } catch (err) {
+    // 文件夹不存在，创建文件夹
+    fs.mkdirSync(hostsFolderPath)
+    console.log('Hosts文件夹已创建')
+  }
+}
 // 使用示例
 const userDirectory = process.env.HOME || process.env.USERPROFILE // 获取用户盘的路径
 const filePath = path.join(userDirectory!, 'chh')
@@ -80,6 +92,7 @@ app.on('ready', async () => {
       .then((fileData) => {
         // 在这里处理文件内容
         console.log('文件读取或创建成功！', fileData)
+        checkAndCreateHostsFolder(path.join(filePath, 'hosts'))
       })
       .catch((err) => {
         console.error('读取或创建文件时出错：', err)

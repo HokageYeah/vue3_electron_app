@@ -1,32 +1,42 @@
 <template>
   <el-container class="layout-container-demo" style="height: 500px">
-    <el-aside style="background-color: orange" width="100px">
+    <el-aside style="background-color: #e8eaed; border-right: 1px solid #c7cbd0" width="100px">
       <el-scrollbar>
         <el-space direction="vertical" style="width: 100%">
           <el-button
-            class="button-click"
             style="width: 100%"
+            :class="['button-click', { active: title == button.name }]"
             v-for="button in tableData"
             :key="button.name"
             size="large"
             :type="buttonType(button.name)"
             link
             @click="btnClick(button.name)"
+            @dblclick="doubleC(button.name)"
             >{{ button.name }}</el-button
           >
         </el-space>
       </el-scrollbar>
     </el-aside>
-    <el-container style="background-color: red">
+    <el-container style="background-color: #fffffe">
       <el-header class="header">
         <div class="toolbar">
           <span>{{ title }}</span>
-          <el-button type="danger" :icon="Delete" circle> </el-button>
+          <el-button
+            :icon="Download"
+            circle
+            link
+            @click="handleChange"
+            v-loading.fullscreen.lock="fullscreenLoading"
+          >
+          </el-button>
         </div>
       </el-header>
       <el-main>
         <el-scrollbar>
-          <span>asdasdsd</span>
+          <code v-show="isNoEmpty" class="code-container">{{ codeContent }}</code>
+          <span v-show="isNoEmpty">asdasdsd</span>
+          <el-empty v-show="!isNoEmpty" :image-size="200" :description="`暂无${title}请下载！`" />
         </el-scrollbar>
       </el-main>
     </el-container>
@@ -34,13 +44,26 @@
 </template>
 
 <script setup lang="ts">
-import { fileReadSync, fileWriteSync, type dataItemType } from '@/utils/file_path'
-import { ref, computed, onMounted, type Ref } from 'vue'
-import { Delete, Edit, Search, Share, Upload } from '@element-plus/icons-vue'
+import {
+  fileReadSync,
+  isFileExists,
+  downloadFile,
+  filePathHosts,
+  type dataItemType
+} from '@/utils/file_path'
+import { ref, onMounted, onUnmounted, type Ref } from 'vue'
+import { Download } from '@element-plus/icons-vue'
+import { useDebounceFn } from '@vueuse/core'
+import { useRouter } from 'vue-router'
 defineOptions({ name: 'DownLoadHostList' })
 let jsonObj: any = {}
 const tableData: Ref<dataItemType[]> = ref([])
-const title = ref('')
+const title = ref('test')
+const isNoEmpty = ref(true)
+let time: any = null
+const fullscreenLoading = ref(false)
+const router = useRouter()
+const codeContent = ref('')
 onMounted(() => {
   fileReadSync()
     .then((fileData: string) => {
@@ -56,34 +79,104 @@ onMounted(() => {
       console.error('读取时出错：', err)
     })
 })
+onUnmounted(() => {
+  time = null
+  clearTimeout(time)
+  console.log('onUnmounted')
+})
 const buttonType = (name: string) => {
   name == jsonObj.current && (title.value = name)
   return name == jsonObj.current ? 'success' : ''
 }
 const btnClick = (name: string) => {
-  title.value = name
+  //取消上次延时未执行的方法
+  clearTimeout(time)
+  time = setTimeout(function () {
+    //do function在此处写单击事件要执行的代码
+    console.log('点击点击了---')
+    title.value = name
+    isNoEmpty.value = isFileExists(name)
+  }, 300)
 }
+const doubleC = (name: string) => {
+  clearTimeout(time)
+  const isNoEmpty = isFileExists(name)
+  if (!isNoEmpty) {
+    ElMessage.error(`${name}无下载，不能切换`)
+    return
+  }
+  console.log('doubleC', name)
+}
+const downLoadHost = () => {
+  console.log('downLoadHost')
+  const item = tableData.value.find((item) => item.name == title.value)
+  if (item!.url == '' || item?.url.length == 0) {
+    ElMessage.error(`请设置${title.value}请求的URL`)
+    clearTimeout(time)
+    time = setTimeout(function () {
+      router.push({
+        name: 'changeHost'
+      })
+    }, 1000)
+    return
+  }
+  fullscreenLoading.value = true
+  downloadFile(item!.url, item!.name, (type: number, content: string) => {
+    fullscreenLoading.value = false
+    if (type == 0) {
+      ElMessage.error(content)
+    } else {
+      ElMessage.success(content)
+      const path = require('node:path')
+      const fileStr = path.join(filePathHosts, `${item!.name}.txt`)
+      debugger
+      console.log('文件地址--', fileStr)
+      fileReadSync(fileStr)
+        .then((fileData: string) => {
+          debugger
+          codeContent.value = fileData
+          console.log('读取内容成功了--', fileData)
+        })
+        .catch((err) => {
+          console.error('读取时出错：', err)
+        })
+    }
+  })
+}
+const handleChange = useDebounceFn(downLoadHost, 500)
 </script>
 <style scoped lang="less">
 .layout-container-demo {
+  border: 1px solid #c7cbd0;
   :deep(.el-space__item) {
     width: 100%;
-    height: 100%;
-    // padding: 30px;
     height: 60px;
   }
-  .button-click {
+  .button-click:hover {
+    background-color: #dfe1e4;
+    border-radius: 0px;
+  }
+  .active {
+    // background-color: red;
+    // border-radius: 0px;
+  }
+  .code-container {
+    white-space: pre-wrap;
+    font-family: Consolas, monospace;
   }
   .header {
+    border-bottom: 1px solid #c7cbd0;
     text-align: center;
     font-size: 16px;
     font-weight: bold;
-    background-color: aqua;
     .toolbar {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       height: 100%;
+      > span {
+        margin-right: 10px;
+      }
     }
   }
 }
