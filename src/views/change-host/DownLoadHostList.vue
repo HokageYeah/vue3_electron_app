@@ -96,6 +96,9 @@ const btnClick = (name: string) => {
     console.log('点击点击了---')
     title.value = name
     isNoEmpty.value = isFileExists(name)
+    if (isNoEmpty.value) {
+      readCodeContent(name)
+    }
   }, 300)
 }
 const doubleC = (name: string) => {
@@ -105,7 +108,21 @@ const doubleC = (name: string) => {
     ElMessage.error(`${name}无下载，不能切换`)
     return
   }
+  readCodeContent(name)
   console.log('doubleC', name)
+}
+const readCodeContent = (name: string) => {
+  const path = require('node:path')
+  const fileStr = path.join(filePathHosts, `${name}.txt`)
+  fileReadSync(fileStr)
+    .then((fileData: string) => {
+      debugger
+      codeContent.value = fileData
+      console.log('读取内容成功了--', fileData)
+    })
+    .catch((err) => {
+      console.error('读取时出错：', err)
+    })
 }
 const downLoadHost = () => {
   console.log('downLoadHost')
@@ -129,17 +146,7 @@ const downLoadHost = () => {
       ElMessage.success(content)
       const path = require('node:path')
       const fileStr = path.join(filePathHosts, `${item!.name}.txt`)
-      debugger
-      console.log('文件地址--', fileStr)
-      fileReadSync(fileStr)
-        .then((fileData: string) => {
-          debugger
-          codeContent.value = fileData
-          console.log('读取内容成功了--', fileData)
-        })
-        .catch((err) => {
-          console.error('读取时出错：', err)
-        })
+      readCodeContent(fileStr)
     }
   })
 }
