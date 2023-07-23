@@ -2,7 +2,8 @@ const path = require('node:path')
 const fs = require('node:fs')
 const os = require('os')
 import axios from 'axios'
-
+const sudoPrompt = require('sudo-prompt')
+const { exec } = require('child_process')
 /** 
 process.env.HOME是 Linux 和 macOS 系统中用于表示用户主目录的环境变量，而在 Windows 上应使用 process.env.USERPROFILE 来获取用户主目录路径。
 然而，尽管process.env.USERPROFILE是正确的变量，但在使用 Electron 框架打包后，默认情况下不再具有这样的环境变量。因此，你需要使用其他方法来获取用户主目录路径。
@@ -24,8 +25,7 @@ const fileReadSync = async (pathfile = filePathAddress) => {
       // console.log('的哈是多久撒朗读记录上----', data);
       try {
         // 同步读取文件
-        const data = fs.readFileSync(pathfile);
-        console.log('读取到的数据:', data);
+        const data = fs.readFileSync(pathfile)
         resolve(data)
         // 在这里处理读取到的数据
       } catch (err) {
@@ -87,16 +87,26 @@ const downloadFile = async (url: string, pathName: string, callback: Function) =
       debugger
       // 将数据写入本地文件
       const fileReader = new FileReader()
-      fileReader.onload = () => {
+      fileReader.onload = async () => {
         const fileContent = fileReader.result // 文件内容
         // 在这里可以处理文件内容，例如将内容写入另一个文件
         try {
           // 示例：将内容写入本地文件
           const savePath = fileStr // 替换为实际保存路径和文件名
           const writer = fs.createWriteStream(savePath)
-          writer.write(fileContent)
-          writer.end()
-          callback(1, '文件内容已保存到本地文件！')
+          writer.write(fileContent, () => {
+            writer.end()
+            process.nextTick(() => {
+              callback(1, '文件内容已保存到本地文件！')
+            })
+            // setTimeout(() => {
+            //   callback(1, '文件内容已保存到本地文件！')
+            // }, 100)
+          })
+
+          // setTimeout(() => {
+          //   callback(1, '文件内容已保存到本地文111件！')
+          // }, 100)
         } catch (error) {
           callback(0, '文件下载保存失败！')
           throw error // 抛出错误
@@ -109,6 +119,129 @@ const downloadFile = async (url: string, pathName: string, callback: Function) =
       callback(0, '文件下载保存失败！')
       throw error // 抛出错误
     })
+}
+const changeCurrent = (fileName: string) => {
+  return new Promise((res, rej) => {
+    fileReadSync().then((fileData: string) => {
+      const obj = JSON.parse(fileData)
+      obj.current = fileName
+      fileWriteSync(obj)
+        .then((str: string) => {
+          res(str)
+        })
+        .catch((err) => {
+          rej(err)
+        })
+    })
+  })
+}
+const addOrUpdateHostsEntry = (content: any, hostname: any, ipAddress: any) => {
+  const lines = content.split('\n')
+  let updatedContent = ''
+  let entryUpdated = false
+  debugger
+  for (const line of lines) {
+    if (line.trim().startsWith(ipAddress)) {
+      // 如果已存在相同的 IP 地址，则更新主机名
+      updatedContent += `${ipAddress} ${hostname}\n`
+      entryUpdated = true
+    } else {
+      updatedContent += `${line}\n`
+    }
+  }
+  debugger
+  if (!entryUpdated) {
+    // 如果 hosts 文件中不存在相同的 IP 地址，则添加新条目
+    updatedContent += `${ipAddress} ${hostname}\n`
+  }
+  console.log(updatedContent)
+}
+
+const updateHostsFile = (hostname: string, downloadedContent: any) => {
+  const isWindows = process.platform === 'win32'
+  let hostsFilePath: string
+
+  if (isWindows) {
+    // Windows 上的 hosts 文件路径
+    hostsFilePath = 'C:\\Windows\\System32\\drivers\\etc\\hosts'
+  } else {
+    // macOS 上的 hosts 文件路径
+    hostsFilePath = '/etc/hosts'
+  }
+  // 读取 hosts 文件内容
+  fs.readFile(hostsFilePath, 'utf-8', (err: any, data: any) => {
+    if (err) {
+      console.error('无法读取 hosts 文件:', err)
+      return
+    }
+    console.log(data)
+    // 在 hosts 文件中添加或更新条目
+    // 查找分隔符位置
+    // 创建分隔符
+    const separator = '# -------------- 下载的主机文件内容 --------------'
+
+    // 查找分隔符位置
+    const separatorStart = data.indexOf(separator)
+    debugger
+    if (separatorStart === -1) {
+      // 如果找不到分隔符，则直接将分隔符、下载的主机文件内容以及原始主机文件内容添加到文件末尾
+      const newContent = `${data}${separator}\n${downloadedContent}`
+      console.log(newContent)
+
+      // 使用 sudo-prompt 执行命令，以管理员权限写入 hosts 文件
+      sudoPrompt.exec(
+        `echo ${newContent} >> ${hostsFilePath}`,
+        { name: 'NodeJSApp' },
+        (error: any, stdout: any, stderr: any) => {
+          debugger
+          if (error) {
+            console.error('无法写入 hosts 文件:', error)
+            return
+          }
+          debugger
+          console.log('已成功添加下载的主机文件内容到 hosts 文件。')
+        }
+      )
+
+      // fs.writeFile(hostsFilePath, newContent, 'utf-8', (err: any) => {
+      //   if (err) {
+      //     console.error('无法写入 hosts 文件:', err)
+      //     return
+      //   }
+
+      //   console.log('已成功添加下载的主机文件内容到 hosts 文件。')
+      // })
+    } else {
+      // 如果找到分隔符，则替换分隔符下方的主机内容
+      const separatorEnd = separatorStart + separator.length
+      const originalContent = data.substring(0, separatorEnd).trim()
+      const newContent = `${originalContent}\n${downloadedContent}`
+      debugger
+      console.log(newContent)
+      // 使用 sudo-prompt 执行命令，以管理员权限写入 hosts 文件
+      sudoPrompt.exec(
+        `echo ${newContent} >> ${hostsFilePath}`,
+        { name: 'NodeJSApp' },
+        (error: any, stdout: any, stderr: any) => {
+          debugger
+          if (error) {
+            console.error('无法写入 hosts 文件:', error)
+            return
+          }
+          debugger
+          console.log('已成功添加下载的主机文件内容到 hosts 文件。')
+        }
+      )
+      // fs.writeFile(hostsFilePath, newContent, 'utf-8', (err: any) => {
+      //   if (err) {
+      //     console.error('无法写入 hosts 文件:', err)
+      //     return
+      //   }
+
+      //   console.log('已成功替换下载的主机文件内容。')
+      // })
+    }
+  })
 }
 
 type dataItemType = {
@@ -125,6 +258,8 @@ export {
   fileReadSync,
   fileWriteSync,
   isFileExists,
-  downloadFile
+  downloadFile,
+  changeCurrent,
+  updateHostsFile
 }
 export type { dataItemType }

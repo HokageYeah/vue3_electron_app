@@ -35,7 +35,6 @@
       <el-main>
         <el-scrollbar>
           <code v-show="isNoEmpty" class="code-container">{{ codeContent }}</code>
-          <span v-show="isNoEmpty">asdasdsd</span>
           <el-empty v-show="!isNoEmpty" :image-size="200" :description="`暂无${title}请下载！`" />
         </el-scrollbar>
       </el-main>
@@ -49,9 +48,11 @@ import {
   isFileExists,
   downloadFile,
   filePathHosts,
+  changeCurrent,
+  updateHostsFile,
   type dataItemType
 } from '@/utils/file_path'
-import { ref, onMounted, onUnmounted, type Ref } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick, type Ref } from 'vue'
 import { Download } from '@element-plus/icons-vue'
 import { useDebounceFn } from '@vueuse/core'
 import { useRouter } from 'vue-router'
@@ -64,7 +65,16 @@ let time: any = null
 const fullscreenLoading = ref(false)
 const router = useRouter()
 const codeContent = ref('')
+let isfires = true
 onMounted(() => {
+  initData()
+})
+onUnmounted(() => {
+  time = null
+  clearTimeout(time)
+  console.log('onUnmounted')
+})
+const initData = () => {
   fileReadSync()
     .then((fileData: string) => {
       jsonObj = JSON.parse(fileData)
@@ -78,14 +88,9 @@ onMounted(() => {
     .catch((err) => {
       console.error('读取时出错：', err)
     })
-})
-onUnmounted(() => {
-  time = null
-  clearTimeout(time)
-  console.log('onUnmounted')
-})
+}
 const buttonType = (name: string) => {
-  name == jsonObj.current && (title.value = name)
+  isfires && name == jsonObj.current && (title.value = name)
   return name == jsonObj.current ? 'success' : ''
 }
 const btnClick = (name: string) => {
@@ -93,32 +98,38 @@ const btnClick = (name: string) => {
   clearTimeout(time)
   time = setTimeout(function () {
     //do function在此处写单击事件要执行的代码
-    console.log('点击点击了---')
     title.value = name
+    isfires = false
     isNoEmpty.value = isFileExists(name)
     if (isNoEmpty.value) {
-      readCodeContent(name)
+      readCodeContent(name, false)
     }
   }, 300)
 }
-const doubleC = (name: string) => {
+const doubleC = async (name: string) => {
   clearTimeout(time)
   const isNoEmpty = isFileExists(name)
   if (!isNoEmpty) {
     ElMessage.error(`${name}无下载，不能切换`)
     return
   }
-  readCodeContent(name)
+  readCodeContent(name, true)
   console.log('doubleC', name)
 }
-const readCodeContent = (name: string) => {
+const readCodeContent = (name: string, isdouble: boolean) => {
   const path = require('node:path')
   const fileStr = path.join(filePathHosts, `${name}.txt`)
   fileReadSync(fileStr)
-    .then((fileData: string) => {
-      debugger
+    .then(async (fileData: string) => {
       codeContent.value = fileData
-      console.log('读取内容成功了--', fileData)
+      if (isdouble) {
+        isfires = true
+        changeCurrent(name).then((res) => {
+          console.log('changeCurrent---')
+          initData()
+          updateHostsFile(name, fileData)
+        })
+      }
     })
     .catch((err) => {
       console.error('读取时出错：', err)
@@ -144,9 +155,8 @@ const downLoadHost = () => {
       ElMessage.error(content)
     } else {
       ElMessage.success(content)
-      const path = require('node:path')
-      const fileStr = path.join(filePathHosts, `${item!.name}.txt`)
-      readCodeContent(fileStr)
+      const fileStr = item!.name
+      readCodeContent(fileStr, false)
     }
   })
 }
