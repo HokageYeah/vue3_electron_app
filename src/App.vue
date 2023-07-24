@@ -1,11 +1,11 @@
 <template>
-  <header>
-    <el-row class="tac">
-      <el-col :span="8">
-        <div class="sidebar-logo-container">
-          <img src="/favicon.png" class="sidebar-logo" />
-          <h1 class="sidebar-title">桌面程序</h1>
-        </div>
+  <el-row class="tac">
+    <el-col :span="8">
+      <div class="sidebar-logo-container">
+        <img src="/favicon.png" class="sidebar-logo" />
+        <h1 class="sidebar-title">桌面程序</h1>
+      </div>
+      <div class="has-logo">
         <el-scrollbar wrap-class="scrollbar-wrapper">
           <el-menu
             active-text-color="#ffd04b"
@@ -26,9 +26,14 @@
             </el-sub-menu>
           </el-menu>
         </el-scrollbar>
-      </el-col>
-    </el-row>
-    <div class="wrapper">
+      </div>
+    </el-col>
+    <el-col :span="16">
+      <RouterView />
+    </el-col>
+  </el-row>
+  <!-- <header> -->
+    <!-- <div class="wrapper">
       <HelloWorld msg="You did it!" />
 
       <nav>
@@ -37,10 +42,10 @@
         <RouterLink to="/change-host">changeHost</RouterLink>
         <RouterLink to="/down-load-host-list">downLoadHost</RouterLink>
       </nav>
-    </div>
-  </header>
+    </div> -->
+  <!-- </header> -->
 
-  <RouterView />
+  <!-- <RouterView /> -->
 </template>
 
 <script setup lang="ts">
@@ -119,9 +124,13 @@ nav a:first-of-type {
   }
 }
 .tac {
+  & .has-logo {
+    background-color: #304156;
+    height: 1000px;
+  }
   & .sidebar-logo-container {
     position: relative;
-    width: 90%;
+    width: 100%;
     height: 50px;
     line-height: 50px;
     background: #2b2f3a;
