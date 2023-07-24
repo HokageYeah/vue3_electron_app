@@ -1,5 +1,39 @@
 <template>
-  <el-row class="tac">
+  <div class="container">
+    <div class="container-left">
+      <div class="sidebar-logo-container">
+        <img src="/favicon.png" class="sidebar-logo" />
+        <h1 class="sidebar-title">桌面程序</h1>
+      </div>
+      <div class="has-logo">
+        <el-scrollbar wrap-class="scrollbar-wrapper">
+          <el-menu
+            active-text-color="#ffd04b"
+            background-color="#545c64"
+            text-color="#fff"
+            default-active="2"
+            class="el-menu-vertical-demo"
+            @open="handleOpen"
+            @close="handleClose"
+          >
+            <el-sub-menu index="1">
+              <template #title>
+                <el-icon><Notebook /></el-icon>
+                <span>Host文件</span>
+              </template>
+              <el-menu-item index="1-1">Host链接</el-menu-item>
+              <el-menu-item index="1-2">Host文件</el-menu-item>
+            </el-sub-menu>
+          </el-menu>
+        </el-scrollbar>
+      </div>
+    </div>
+    <div class="container-right">
+      <RouterView />
+    </div>
+  </div>
+
+  <!-- <el-row class="tac">
     <el-col :span="8">
       <div class="sidebar-logo-container">
         <img src="/favicon.png" class="sidebar-logo" />
@@ -31,9 +65,9 @@
     <el-col :span="16">
       <RouterView />
     </el-col>
-  </el-row>
+  </el-row> -->
   <!-- <header> -->
-    <!-- <div class="wrapper">
+  <!-- <div class="wrapper">
       <HelloWorld msg="You did it!" />
 
       <nav>
@@ -153,6 +187,48 @@ nav a:first-of-type {
       // font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
       vertical-align: middle;
     }
+  }
+}
+.container {
+  display: flex;
+  flex-direction: row;
+  // width: 100%;
+  min-width: 1024px;
+  &-left {
+    width: 30%;
+    & .has-logo {
+      background-color: #304156;
+      height: 1000px;
+    }
+    & .sidebar-logo-container {
+      position: relative;
+      width: 100%;
+      height: 50px;
+      line-height: 50px;
+      background: #2b2f3a;
+      text-align: center;
+      overflow: hidden;
+      & .sidebar-logo {
+        width: 32px;
+        height: 32px;
+        vertical-align: middle;
+        margin-right: 12px;
+      }
+      & .sidebar-title {
+        background: #2b2f3a;
+        display: inline-block;
+        margin: 0;
+        color: #fff;
+        font-weight: 600;
+        line-height: 50px;
+        font-size: 18px;
+        // font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
+        vertical-align: middle;
+      }
+    }
+  }
+  &-right {
+    width: 70%;
   }
 }
 </style>
