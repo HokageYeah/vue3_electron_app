@@ -23,6 +23,7 @@
         <div class="toolbar">
           <span>{{ title }}</span>
           <el-button
+            v-show="title !== '系统host'"
             :icon="Download"
             circle
             link
@@ -34,7 +35,12 @@
       </el-header>
       <el-main>
         <el-scrollbar>
-          <code v-show="isNoEmpty" class="code-container">{{ codeContent }}</code>
+          <!-- <code v-show="isNoEmpty" class="code-container">{{ codeContent }}</code> -->
+          <p
+            v-show="isNoEmpty"
+            class="code-container"
+            v-html="formatText(codeContent.toString())"
+          ></p>
           <el-empty v-show="!isNoEmpty" :image-size="200" :description="`暂无${title}请下载！`" />
         </el-scrollbar>
       </el-main>
@@ -50,6 +56,7 @@ import {
   filePathHosts,
   changeCurrent,
   updateHostsFile,
+  readLocalHostsFile,
   type dataItemType
 } from '@/utils/file_path'
 import { ref, onMounted, onUnmounted, nextTick, type Ref } from 'vue'
@@ -83,6 +90,10 @@ const initData = () => {
         name,
         url
       })) as dataItemType[]
+      result.unshift({
+        name: '系统host',
+        url: '0'
+      })
       tableData.value = result
     })
     .catch((err) => {
@@ -96,18 +107,31 @@ const buttonType = (name: string) => {
 const btnClick = (name: string) => {
   //取消上次延时未执行的方法
   clearTimeout(time)
-  time = setTimeout(function () {
-    //do function在此处写单击事件要执行的代码
+  time = setTimeout(() => {
+    debugger
     title.value = name
-    isfires = false
-    isNoEmpty.value = isFileExists(name)
-    if (isNoEmpty.value) {
-      readCodeContent(name, false)
+    if (name == '系统host') {
+      readLocalHostsFile()
+        .then(({ data }: any) => {
+          isNoEmpty.value = true
+          codeContent.value = data
+        })
+        .catch((err) => {
+          console.error(err)
+        })
+    } else {
+      //do function在此处写单击事件要执行的代码
+      isfires = false
+      isNoEmpty.value = isFileExists(name)
+      if (isNoEmpty.value) {
+        readCodeContent(name, false)
+      }
     }
   }, 300)
 }
 const doubleC = async (name: string) => {
   clearTimeout(time)
+  if (name == '系统host') return
   const isNoEmpty = isFileExists(name)
   if (!isNoEmpty) {
     ElMessage.error(`${name}无下载，不能切换`)
@@ -141,7 +165,7 @@ const downLoadHost = () => {
   if (item!.url == '' || item?.url.length == 0) {
     ElMessage.error(`请设置${title.value}请求的URL`)
     clearTimeout(time)
-    time = setTimeout(function () {
+    time = setTimeout(() => {
       router.push({
         name: 'changeHost'
       })
@@ -161,6 +185,18 @@ const downLoadHost = () => {
   })
 }
 const handleChange = useDebounceFn(downLoadHost, 500)
+
+const formatText = (text: string) => {
+  debugger
+  const parts = text.split(/(#.+)/)
+  const formattedParts = parts.map((part: string) => {
+    if (part.startsWith('#')) {
+      return `<span style="color: green;">${part}</span>`
+    }
+    return part
+  })
+  return formattedParts.join('')
+}
 </script>
 <style scoped lang="less">
 .layout-container-demo {

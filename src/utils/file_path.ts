@@ -157,91 +157,105 @@ const addOrUpdateHostsEntry = (content: any, hostname: any, ipAddress: any) => {
   console.log(updatedContent)
 }
 
-const updateHostsFile = (hostname: string, downloadedContent: any) => {
-  const isWindows = process.platform === 'win32'
-  let hostsFilePath: string
+const readLocalHostsFile = () => {
+  return new Promise((res, rej) => {
+    const isWindows = process.platform === 'win32'
+    let hostsFilePath: string
 
-  if (isWindows) {
-    // Windows 上的 hosts 文件路径
-    hostsFilePath = 'C:\\Windows\\System32\\drivers\\etc\\hosts'
-  } else {
-    // macOS 上的 hosts 文件路径
-    hostsFilePath = '/etc/hosts'
-  }
-  // 读取 hosts 文件内容
-  fs.readFile(hostsFilePath, 'utf-8', (err: any, data: any) => {
-    if (err) {
-      console.error('无法读取 hosts 文件:', err)
-      return
-    }
-    console.log(data)
-    // 在 hosts 文件中添加或更新条目
-    // 查找分隔符位置
-    // 创建分隔符
-    const separator = '# -------------- 下载的主机文件内容 --------------'
-
-    // 查找分隔符位置
-    const separatorStart = data.indexOf(separator)
-    debugger
-    if (separatorStart === -1) {
-      // 如果找不到分隔符，则直接将分隔符、下载的主机文件内容以及原始主机文件内容添加到文件末尾
-      const newContent = `${data}${separator}\n${downloadedContent}`
-      console.log(newContent)
-
-      // 使用 sudo-prompt 执行命令，以管理员权限写入 hosts 文件
-      sudoPrompt.exec(
-        `echo ${newContent} >> ${hostsFilePath}`,
-        { name: 'NodeJSApp' },
-        (error: any, stdout: any, stderr: any) => {
-          debugger
-          if (error) {
-            console.error('无法写入 hosts 文件:', error)
-            return
-          }
-          debugger
-          console.log('已成功添加下载的主机文件内容到 hosts 文件。')
-        }
-      )
-
-      // fs.writeFile(hostsFilePath, newContent, 'utf-8', (err: any) => {
-      //   if (err) {
-      //     console.error('无法写入 hosts 文件:', err)
-      //     return
-      //   }
-
-      //   console.log('已成功添加下载的主机文件内容到 hosts 文件。')
-      // })
+    if (isWindows) {
+      // Windows 上的 hosts 文件路径
+      hostsFilePath = 'C:\\Windows\\System32\\drivers\\etc\\hosts'
     } else {
-      // 如果找到分隔符，则替换分隔符下方的主机内容
-      const separatorEnd = separatorStart + separator.length
-      const originalContent = data.substring(0, separatorEnd).trim()
-      const newContent = `${originalContent}\n${downloadedContent}`
-      debugger
-      console.log(newContent)
-      // 使用 sudo-prompt 执行命令，以管理员权限写入 hosts 文件
-      sudoPrompt.exec(
-        `echo ${newContent} >> ${hostsFilePath}`,
-        { name: 'NodeJSApp' },
-        (error: any, stdout: any, stderr: any) => {
-          debugger
-          if (error) {
-            console.error('无法写入 hosts 文件:', error)
-            return
-          }
-          debugger
-          console.log('已成功添加下载的主机文件内容到 hosts 文件。')
-        }
-      )
-      // fs.writeFile(hostsFilePath, newContent, 'utf-8', (err: any) => {
-      //   if (err) {
-      //     console.error('无法写入 hosts 文件:', err)
-      //     return
-      //   }
-
-      //   console.log('已成功替换下载的主机文件内容。')
-      // })
+      // macOS 上的 hosts 文件路径
+      hostsFilePath = '/etc/hosts'
     }
+    // 读取 hosts 文件内容
+    fs.readFile(hostsFilePath, 'utf-8', (err: any, data: any) => {
+      if (err) {
+        console.error('无法读取 hosts 文件:', err)
+        rej(`无法读取 hosts 文件:${err}`)
+        return
+      }
+      res({ hostsFilePath, data })
+      console.log(data)
+    })
   })
+}
+
+const updateHostsFile = (hostname: string, downloadedContent: any) => {
+  readLocalHostsFile()
+    .then(({ hostsFilePath, data }: any) => {
+      console.log(data)
+      // 在 hosts 文件中添加或更新条目
+      // 查找分隔符位置
+      // 创建分隔符
+      const separator = '# -------------- 已下是下载的主机host文件内容 --------------'
+
+      // 查找分隔符位置
+      const separatorStart = data.indexOf(separator)
+      debugger
+      if (separatorStart === -1) {
+        // 如果找不到分隔符，则直接将分隔符、下载的主机文件内容以及原始主机文件内容添加到文件末尾
+        const newContent = `${data}\n\n\n${separator}\n${downloadedContent}`
+        debugger
+        console.log(newContent)
+
+        // 使用 sudo-prompt 执行命令，以管理员权限写入 hosts 文件
+        sudoPrompt.exec(
+          `/bin/bash -c "echo '${newContent}' > '${hostsFilePath}'"`,
+          { name: 'ChangeHostApp' },
+          (error: any, stdout: any, stderr: any) => {
+            debugger
+            if (error) {
+              console.error('无法写入 hosts 文件:', error)
+              return
+            }
+            debugger
+            console.log('已成功添加下载的主机文件内容到 hosts 文件。')
+          }
+        )
+        // fs.writeFile(hostsFilePath, newContent, 'utf-8', (err: any) => {
+        //   if (err) {
+        //     console.error('无法写入 hosts 文件:', err)
+        //     return
+        //   }
+
+        //   console.log('已成功添加下载的主机文件内容到 hosts 文件。')
+        // })
+      } else {
+        // 如果找到分隔符，则替换分隔符下方的主机内容
+        const separatorEnd = separatorStart + separator.length
+        const originalContent = data.substring(0, separatorEnd).trim()
+        const newContent = `${originalContent}\n${downloadedContent}`
+        debugger
+        console.log(newContent)
+        // 使用 sudo-prompt 执行命令，以管理员权限写入 hosts 文件
+        sudoPrompt.exec(
+          `/bin/bash -c "echo '${newContent}' > '${hostsFilePath}'"`,
+          { name: 'ChangeHostApp' },
+          (error: any, stdout: any, stderr: any) => {
+            debugger
+            if (error) {
+              console.error('无法写入 hosts 文件:', error)
+              return
+            }
+            debugger
+            console.log('已成功添加下载的主机文件内容到 hosts 文件。')
+          }
+        )
+        // fs.writeFile(hostsFilePath, newContent, 'utf-8', (err: any) => {
+        //   if (err) {
+        //     console.error('无法写入 hosts 文件:', err)
+        //     return
+        //   }
+
+        //   console.log('已成功替换下载的主机文件内容。')
+        // })
+      }
+    })
+    .catch((err) => {
+      console.error(err)
+    })
 }
 
 type dataItemType = {
@@ -260,6 +274,7 @@ export {
   isFileExists,
   downloadFile,
   changeCurrent,
-  updateHostsFile
+  updateHostsFile,
+  readLocalHostsFile
 }
 export type { dataItemType }
