@@ -182,6 +182,22 @@ const readLocalHostsFile = () => {
   })
 }
 
+function convertToEchoCommands(inputContent: string, filePath: string, issecond = false) {
+  const lines = inputContent.split('\n')
+  const echoCommands = []
+
+  for (const line of lines) {
+    if (line.trim() !== '') {
+      const echoCommand = issecond
+        ? `echo ${line.trim()} > ${filePath}`
+        : `echo ${line.trim()} >> ${filePath}`
+      echoCommands.push(echoCommand)
+    }
+  }
+
+  return echoCommands.join('\n')
+}
+
 const updateHostsFile = (hostname: string, downloadedContent: any) => {
   readLocalHostsFile()
     .then(({ hostsFilePath, data }: any) => {
@@ -196,13 +212,25 @@ const updateHostsFile = (hostname: string, downloadedContent: any) => {
       debugger
       if (separatorStart === -1) {
         // 如果找不到分隔符，则直接将分隔符、下载的主机文件内容以及原始主机文件内容添加到文件末尾
-        const newContent = `${data}\n\n\n${separator}\n${downloadedContent}`
+        let newContent = `${data}\n\n\n${separator}\n${downloadedContent}`
+        const isWindows = process.platform === 'win32'
+        let echoStr = `/bin/bash -c "echo '${newContent}' > '${hostsFilePath}'"`
+        if (isWindows) {
+          debugger
+          newContent = `${separator}\n${downloadedContent}`
+          // newContent = `${downloadedContent}`
+          newContent = convertToEchoCommands(newContent.toString(), hostsFilePath)
+          debugger
+          echoStr = `${newContent} >> "${hostsFilePath}"`
+        }
         debugger
         console.log(newContent)
 
         // 使用 sudo-prompt 执行命令，以管理员权限写入 hosts 文件
         sudoPrompt.exec(
-          `/bin/bash -c "echo '${newContent}' > '${hostsFilePath}'"`,
+          // `/bin/bash -c "echo '${newContent}' > '${hostsFilePath}'"`,
+          // `echo ${downloadedContent} >> ${hostsFilePath}`,
+          echoStr,
           { name: 'ChangeHostApp' },
           (error: any, stdout: any, stderr: any) => {
             debugger
@@ -226,12 +254,22 @@ const updateHostsFile = (hostname: string, downloadedContent: any) => {
         // 如果找到分隔符，则替换分隔符下方的主机内容
         const separatorEnd = separatorStart + separator.length
         const originalContent = data.substring(0, separatorEnd).trim()
-        const newContent = `${originalContent}\n${downloadedContent}`
+        let newContent = `${originalContent}\n${downloadedContent}`
+
+        const isWindows = process.platform === 'win32'
+        let echoStr = `/bin/bash -c "echo '${newContent}' > '${hostsFilePath}'"`
+        if (isWindows) {
+          newContent = `\n${downloadedContent}`
+          newContent = convertToEchoCommands(newContent.toString(), hostsFilePath, true)
+          debugger
+          echoStr = `echo ${newContent} > ${hostsFilePath}`
+        }
         debugger
         console.log(newContent)
         // 使用 sudo-prompt 执行命令，以管理员权限写入 hosts 文件
         sudoPrompt.exec(
-          `/bin/bash -c "echo '${newContent}' > '${hostsFilePath}'"`,
+          // `/bin/bash -c "echo '${newContent}' > '${hostsFilePath}'"`,
+          echoStr,
           { name: 'ChangeHostApp' },
           (error: any, stdout: any, stderr: any) => {
             debugger

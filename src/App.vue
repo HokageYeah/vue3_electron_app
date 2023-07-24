@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <!-- <div class="container">
     <div class="container-left">
       <div class="sidebar-logo-container">
         <img src="/favicon.png" class="sidebar-logo" />
@@ -31,7 +31,7 @@
     <div class="container-right">
       <RouterView />
     </div>
-  </div>
+  </div> -->
 
   <!-- <el-row class="tac">
     <el-col :span="8">
@@ -66,8 +66,8 @@
       <RouterView />
     </el-col>
   </el-row> -->
-  <!-- <header> -->
-  <!-- <div class="wrapper">
+  <header>
+  <div class="wrapper">
       <HelloWorld msg="You did it!" />
 
       <nav>
@@ -76,10 +76,10 @@
         <RouterLink to="/change-host">changeHost</RouterLink>
         <RouterLink to="/down-load-host-list">downLoadHost</RouterLink>
       </nav>
-    </div> -->
-  <!-- </header> -->
+    </div>
+  </header>
 
-  <!-- <RouterView /> -->
+  <RouterView />
 </template>
 
 <script setup lang="ts">
