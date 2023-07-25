@@ -1,5 +1,5 @@
 <template>
-  <el-container class="layout-container-demo" style="height: 500px">
+  <el-container class="layout-container-demo" style="height: 95vh;">
     <el-aside style="background-color: #e8eaed; border-right: 1px solid #c7cbd0" width="100px">
       <el-scrollbar>
         <el-space direction="vertical" style="width: 100%">
@@ -34,15 +34,17 @@
         </div>
       </el-header>
       <el-main>
-        <el-scrollbar>
-          <!-- <code v-show="isNoEmpty" class="code-container">{{ codeContent }}</code> -->
-          <p
-            v-show="isNoEmpty"
-            class="code-container"
-            v-html="formatText(codeContent.toString())"
-          ></p>
-          <el-empty v-show="!isNoEmpty" :image-size="200" :description="`暂无${title}请下载！`" />
-        </el-scrollbar>
+        <div class="div-main">
+          <el-scrollbar>
+            <!-- <code v-show="isNoEmpty" class="code-container">{{ codeContent }}</code> -->
+            <p
+              v-show="isNoEmpty"
+              class="code-container"
+              v-html="formatText(codeContent.toString())"
+            ></p>
+            <el-empty v-show="!isNoEmpty" :image-size="200" :description="`暂无${title}请下载！`" />
+          </el-scrollbar>
+        </div>
       </el-main>
     </el-container>
   </el-container>
@@ -201,6 +203,11 @@ const formatText = (text: string) => {
 <style scoped lang="less">
 .layout-container-demo {
   border: 1px solid #c7cbd0;
+  // position: fixed;
+  // top: 20px;
+  // right: 20px;
+  // bottom: 20px;
+  // left: 230px;
   :deep(.el-space__item) {
     width: 100%;
     height: 60px;

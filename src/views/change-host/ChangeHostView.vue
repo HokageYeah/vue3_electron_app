@@ -1,6 +1,6 @@
 <template>
-  <div style="background-color: brown">
-    <el-table :data="tableData" style="width: 100%;" border stripe>
+  <div style="background-color: brown;">
+    <el-table :data="tableData" style="width: 100%" border stripe>
       <el-table-column prop="name" label="Name" width="120" />
       <el-table-column prop="url" label="Url" />
       <el-table-column fixed="right" label="Operations" width="160" align="center">

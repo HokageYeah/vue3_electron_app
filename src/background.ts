@@ -6,6 +6,11 @@ app.whenReady().then(() => {
   const win = new BrowserWindow({
     height: 750,
     width: 1180,
+    minHeight: 580,
+    minWidth: 880,
+    titleBarStyle: 'default',
+    // frame: false, // 隐藏默认边框
+    // icon: path.join(__dirname, './dist/favicon.ico'),
     webPreferences: {
       nodeIntegration: true, // 启用Node.js集成（可以在渲染进程中使用node的api 为了安全，默认关闭false）
       contextIsolation: false, // 禁用上下文隔离（关闭渲染进程的沙箱）
@@ -13,6 +18,9 @@ app.whenReady().then(() => {
     }
   })
   win.webContents.openDevTools()
+  // if (process.platform === 'darwin') {
+  //   app.dock.setIcon(path.join(__dirname, './dist/favicon.ico'))
+  // }
   debugger
   console.log('process.argv', process.argv)
   if (process.argv[2]) {
