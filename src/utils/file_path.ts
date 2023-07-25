@@ -253,16 +253,19 @@ const updateHostsFile = (hostname: string, downloadedContent: any) => {
       } else {
         // 如果找到分隔符，则替换分隔符下方的主机内容
         const separatorEnd = separatorStart + separator.length
-        const originalContent = data.substring(0, separatorEnd).trim()
+        const originalContent = data.substring(0, separatorEnd)
         let newContent = `${originalContent}\n${downloadedContent}`
-
+        debugger
         const isWindows = process.platform === 'win32'
         let echoStr = `/bin/bash -c "echo '${newContent}' > '${hostsFilePath}'"`
         if (isWindows) {
-          newContent = `\n${downloadedContent}`
+          // newContent = `\n${downloadedContent}`
+          // newContent = originalContent.toString()
+          newContent = `${separator}\n${downloadedContent}`
           newContent = convertToEchoCommands(newContent.toString(), hostsFilePath, true)
           debugger
-          echoStr = `echo ${newContent} > ${hostsFilePath}`
+          echoStr = `${newContent} >> ${hostsFilePath}`
+          // echoStr = newContent
         }
         debugger
         console.log(newContent)
