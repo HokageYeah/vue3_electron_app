@@ -189,13 +189,30 @@ function convertToEchoCommands(inputContent: string, filePath: string, issecond 
   for (const line of lines) {
     if (line.trim() !== '') {
       const echoCommand = issecond
-        ? `echo ${line.trim()} > ${filePath}`
+        ? `echo ${line.trim()} > ${filePath} >> ${filePath}`
         : `echo ${line.trim()} >> ${filePath}`
       echoCommands.push(echoCommand)
     }
   }
 
   return echoCommands.join('\n')
+}
+
+// 中文编码
+const encodeChineseInString = (str: string) => {
+  const pattern = /[\u4e00-\u9fa5]+/g
+  const matches = str.match(pattern)
+
+  if (!matches) {
+    return str
+  }
+
+  for (let i = 0; i < matches.length; i++) {
+    const encodedStr = encodeURIComponent(matches[i])
+    str = str.replace(matches[i], encodedStr)
+  }
+
+  return str
 }
 
 const updateHostsFile = (hostname: string, downloadedContent: any) => {
@@ -205,7 +222,7 @@ const updateHostsFile = (hostname: string, downloadedContent: any) => {
       // 在 hosts 文件中添加或更新条目
       // 查找分隔符位置
       // 创建分隔符
-      const separator = '# -------------- 已下是下载的主机host文件内容 --------------'
+      const separator = '# -------------- requestHost --------------'
 
       // 查找分隔符位置
       const separatorStart = data.indexOf(separator)
@@ -218,10 +235,11 @@ const updateHostsFile = (hostname: string, downloadedContent: any) => {
         if (isWindows) {
           debugger
           newContent = `${separator}\n${downloadedContent}`
+          // newContent = encodeChineseInString(newContent)
           // newContent = `${downloadedContent}`
           newContent = convertToEchoCommands(newContent.toString(), hostsFilePath)
           debugger
-          echoStr = `${newContent} >> "${hostsFilePath}"`
+          echoStr = `\n${newContent} >> "${hostsFilePath}"`
         }
         debugger
         console.log(newContent)
@@ -261,12 +279,18 @@ const updateHostsFile = (hostname: string, downloadedContent: any) => {
         if (isWindows) {
           // newContent = `\n${downloadedContent}`
           // newContent = originalContent.toString()
-          newContent = `${separator}\n${downloadedContent}`
+          // newContent = `${separator}\n${downloadedContent}`
+          // newContent = encodeChineseInString(newContent)
+          debugger
           newContent = convertToEchoCommands(newContent.toString(), hostsFilePath, true)
           debugger
-          echoStr = `${newContent} >> ${hostsFilePath}`
+          echoStr = `echo. > ${hostsFilePath}\n${newContent}`
           // echoStr = newContent
         }
+        // echoStr = 'echo # 102.54.94.97123  DDD > "C:\\Windows\\System32\\drivers\\etc\\hosts" >> "C:\\Windows\\System32\\drivers\\etc\\hosts" \necho # 111.111.111  dsds > C:\\Windows\\System32\\drivers\\etc\\hosts >> "C:\\Windows\\System32\\drivers\\etc\\hosts" \necho # 111.111.222  dsdsssds > C:\\Windows\\System32\\drivers\\etc\\hosts >> "C:\\Windows\\System32\\drivers\\etc\\hosts"'
+        // echoStr = 'echo. > C:\\Windows\\System32\\drivers\\etc\\hosts\necho # 102.54.94.97123  DDD > "C:\\Windows\\System32\\drivers\\etc\\hosts" >> "C:\\Windows\\System32\\drivers\\etc\\hosts" \necho #  -------------- 已下是下载的主机host文件内容 -------------- > C:\\Windows\\System32\\drivers\\etc\\hosts >> C:\\Windows\\System32\\drivers\\etc\\hosts\necho # 111.111.111  dsds > C:\\Windows\\System32\\drivers\\etc\\hosts >> "C:\\Windows\\System32\\drivers\\etc\\hosts" \necho # 111.111.222  dsdsssds > C:\\Windows\\System32\\drivers\\etc\\hosts >> "C:\\Windows\\System32\\drivers\\etc\\hosts"'
+        // echoStr = 'echo # 102.54.94.97123  DDD > C:\\Windows\\System32\\drivers\\etc\\hosts\necho # -------------- 已下是下载的主机host文件内容 -------------- > C:\\Windows\\System32\\drivers\\etc\\hosts\necho # 111.111.111  dsds > C:\\Windows\\System32\\drivers\\etc\\hosts\necho # 111.111.222  dsdsssds > C:\\Windows\\System32\\drivers\\etc\\hosts >> C:\\Windows\\System32\\drivers\\etc\\hosts'
+        // echoStr = 'echo # -------------- 已下是下载的主机host文件内容 -------------- >> C:\\Windows\\System32\\drivers\\etc\\hosts\necho # 111.111.111  dsds >> C:\\Windows\\System32\\drivers\\etc\\hosts\necho # 111.111.222  dsdsssds >> C:\\Windows\\System32\\drivers\\etc\\hosts >> "C:\\Windows\\System32\\drivers\\etc\\hosts"'
         debugger
         console.log(newContent)
         // 使用 sudo-prompt 执行命令，以管理员权限写入 hosts 文件
