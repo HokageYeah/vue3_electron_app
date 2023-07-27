@@ -103,14 +103,16 @@ const initData = () => {
     })
 }
 const buttonType = (name: string) => {
-  isfires && name == jsonObj.current && (title.value = name)
+  if(name == jsonObj.current && isfires) {
+    btnClick(name)
+    title.value = name
+  }
   return name == jsonObj.current ? 'success' : ''
 }
 const btnClick = (name: string) => {
   //取消上次延时未执行的方法
   clearTimeout(time)
   time = setTimeout(() => {
-    debugger
     title.value = name
     if (name == '系统host') {
       readLocalHostsFile()
@@ -189,7 +191,6 @@ const downLoadHost = () => {
 const handleChange = useDebounceFn(downLoadHost, 500)
 
 const formatText = (text: string) => {
-  debugger
   const parts = text.split(/(#.+)/)
   const formattedParts = parts.map((part: string) => {
     if (part.startsWith('#')) {

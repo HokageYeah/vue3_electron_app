@@ -46,7 +46,6 @@ const removeUrl = (index: number) => {
 const getData = async () => {
   try {
     const response = await axios.get('/hostAddress.json') // 发送 GET 请求获取 JSON 数据
-    debugger
     console.log(response)
   } catch (error) {
     console.error(error)

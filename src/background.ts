@@ -8,6 +8,8 @@ app.whenReady().then(() => {
     width: 1180,
     minHeight: 580,
     minWidth: 880,
+    maxHeight: 880,
+    maxWidth: 1380,
     titleBarStyle: 'default',
     // frame: false, // 隐藏默认边框
     icon: path.join(__dirname, 'favicon.ico'),
@@ -17,7 +19,7 @@ app.whenReady().then(() => {
       webSecurity: false // 禁用web安全策略（关闭跨域检查）
     }
   })
-  win.webContents.openDevTools()
+  // win.webContents.openDevTools()
   // if (process.platform === 'darwin') {
   //   app.dock.setIcon(path.join(__dirname, './dist/favicon.ico'))
   // }

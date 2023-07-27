@@ -24,6 +24,13 @@ export const ElectronBuildPlugin = (): Plugin => {
       // 防止没有运行pnpm run dev 生成dist打包文件，而是直接运行pnpm run build的情况， 直接运行build的话就没有dist/background.js 会报错
       buildBackground()
 
+      // 打包前先判断是否有打包输出目录release，如果有则先清空
+      const distPath = path.join(process.cwd(), 'release')
+      console.log('打包输出目录-----', distPath)
+
+      if (fs.existsSync(distPath)) {
+        fs.rmdirSync(distPath, { recursive: true })
+      }
       // electron-builder 需要指定package.json main
       // 需要操作package.json文件
       const json = JSON.parse(fs.readFileSync('package.json', 'utf-8'))
@@ -35,7 +42,7 @@ export const ElectronBuildPlugin = (): Plugin => {
       electronBuilder.build({
         config: {
           appId: 'com.exampleYeah.app',
-          productName: '桌面工具',
+          productName: '桌面工具', //应用名称
           directories: {
             output: path.join(process.cwd(), 'release'), //输出目录
             app: path.join(process.cwd(), 'dist') //app目录
