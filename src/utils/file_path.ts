@@ -195,7 +195,7 @@ function convertToEchoCommands(inputContent: string, filePath: string, issecond 
     }
   }
 
-  return echoCommands.join('\n')
+  return issecond ? echoCommands.join('\n\n;    ') : echoCommands.join('\n')
 }
 
 // 中文编码
@@ -284,11 +284,13 @@ const updateHostsFile = (hostname: string, downloadedContent: any) => {
           debugger
           newContent = convertToEchoCommands(newContent.toString(), hostsFilePath, true)
           debugger
-          echoStr = `echo. > ${hostsFilePath}\n${newContent}`
+          echoStr = `echo. > ${hostsFilePath}\n\n;    ${newContent}`
           // echoStr = newContent
         }
         // echoStr = 'echo # 102.54.94.97123  DDD > "C:\\Windows\\System32\\drivers\\etc\\hosts" >> "C:\\Windows\\System32\\drivers\\etc\\hosts" \necho # 111.111.111  dsds > C:\\Windows\\System32\\drivers\\etc\\hosts >> "C:\\Windows\\System32\\drivers\\etc\\hosts" \necho # 111.111.222  dsdsssds > C:\\Windows\\System32\\drivers\\etc\\hosts >> "C:\\Windows\\System32\\drivers\\etc\\hosts"'
-        // echoStr = 'echo. > C:\\Windows\\System32\\drivers\\etc\\hosts\necho # 102.54.94.97123  DDD > "C:\\Windows\\System32\\drivers\\etc\\hosts" >> "C:\\Windows\\System32\\drivers\\etc\\hosts" \necho #  -------------- 已下是下载的主机host文件内容 -------------- > C:\\Windows\\System32\\drivers\\etc\\hosts >> C:\\Windows\\System32\\drivers\\etc\\hosts\necho # 111.111.111  dsds > C:\\Windows\\System32\\drivers\\etc\\hosts >> "C:\\Windows\\System32\\drivers\\etc\\hosts" \necho # 111.111.222  dsdsssds > C:\\Windows\\System32\\drivers\\etc\\hosts >> "C:\\Windows\\System32\\drivers\\etc\\hosts"'
+        // echoStr = 'echo. > C:\\Windows\\System32\\drivers\\etc\\hosts\necho # 102.54.94.97123  DDD > "C:\\Windows\\System32\\drivers\\etc\\hosts" >> "C:\\Windows\\System32\\drivers\\etc\\hosts" \necho #  -------------- request的 -------------- > C:\\Windows\\System32\\drivers\\etc\\hosts >> C:\\Windows\\System32\\drivers\\etc\\hosts\necho # 111.111.111  dsds > C:\\Windows\\System32\\drivers\\etc\\hosts >> "C:\\Windows\\System32\\drivers\\etc\\hosts" \necho # 111.111.222  dsdsssds > C:\\Windows\\System32\\drivers\\etc\\hosts >> "C:\\Windows\\System32\\drivers\\etc\\hosts"'
+        // echoStr = 'echo. > C:\\Windows\\System32\\drivers\\etc\\hosts\n\n;    echo # 111.111.222  ceshic是的ed > C:\\Windows\\System32\\drivers\\etc\\hosts >> C:\\Windows\\System32\\drivers\\etc\\hosts\n\n;    echo # -------------- request的 -------------- > C:\\Windows\\System32\\drivers\\etc\\hosts >> C:\\Windows\\System32\\drivers\\etc\\hosts\n\n;    echo # 111.111.222  ceshiceshi > C:\\Windows\\System32\\drivers\\etc\\hosts >> "C:\\Windows\\System32\\drivers\\etc\\hosts"'
+        // echoStr = 'echo. > C:\\\\Windows\\\\System32\\\\drivers\\\\etc\\\\hosts\necho #  -------------- request的 -------------- >> C:\\\\Windows\\\\System32\\\\drivers\\\\etc\\\\hosts\necho # 111.111.222  ceshiceshi >> "C:\\\\Windows\\\\System32\\\\drivers\\\\etc\\\\hosts"';
         // echoStr = 'echo # 102.54.94.97123  DDD > C:\\Windows\\System32\\drivers\\etc\\hosts\necho # -------------- 已下是下载的主机host文件内容 -------------- > C:\\Windows\\System32\\drivers\\etc\\hosts\necho # 111.111.111  dsds > C:\\Windows\\System32\\drivers\\etc\\hosts\necho # 111.111.222  dsdsssds > C:\\Windows\\System32\\drivers\\etc\\hosts >> C:\\Windows\\System32\\drivers\\etc\\hosts'
         // echoStr = 'echo # -------------- 已下是下载的主机host文件内容 -------------- >> C:\\Windows\\System32\\drivers\\etc\\hosts\necho # 111.111.111  dsds >> C:\\Windows\\System32\\drivers\\etc\\hosts\necho # 111.111.222  dsdsssds >> C:\\Windows\\System32\\drivers\\etc\\hosts >> "C:\\Windows\\System32\\drivers\\etc\\hosts"'
         debugger
@@ -297,6 +299,7 @@ const updateHostsFile = (hostname: string, downloadedContent: any) => {
         sudoPrompt.exec(
           // `/bin/bash -c "echo '${newContent}' > '${hostsFilePath}'"`,
           echoStr,
+          // `powershell.exe -Command "${echoStr}"`,
           { name: 'ChangeHostApp' },
           (error: any, stdout: any, stderr: any) => {
             debugger
