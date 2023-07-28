@@ -4,6 +4,7 @@ const os = require('os')
 import axios from 'axios'
 const sudoPrompt = require('sudo-prompt')
 const { exec } = require('child_process')
+
 /** 
 process.env.HOME是 Linux 和 macOS 系统中用于表示用户主目录的环境变量，而在 Windows 上应使用 process.env.USERPROFILE 来获取用户主目录路径。
 然而，尽管process.env.USERPROFILE是正确的变量，但在使用 Electron 框架打包后，默认情况下不再具有这样的环境变量。因此，你需要使用其他方法来获取用户主目录路径。
@@ -11,6 +12,39 @@ process.env.HOME是 Linux 和 macOS 系统中用于表示用户主目录的环�
 */
 const userDirectory = process.env.HOME || process.env.USERPROFILE || os.homedir() // 获取用户盘的路径
 console.log('userDirectory-------', userDirectory)
+const currentFilePath = new URL(import.meta.url).pathname
+const __dirname = currentFilePath.substring(0, currentFilePath.lastIndexOf('/'))
+const crossPlatformPath = path.resolve(__dirname, './yeah_test.vue')
+
+console.log('__dirname-------', __dirname)
+console.log('currentFilePath-------', crossPlatformPath)
+debugger
+const fileContent = `<template>
+  <div>
+    你好我是模板
+    <!-- 在这里编写模板内容 -->
+  </div>
+</template>
+
+<script>
+export default {
+  // 在这里编写脚本内容
+}
+</script>
+
+<style scoped>
+/* 在这里编写样式内容 */
+</style>`
+debugger
+// fs.writeFile('./src/utils/yeah_test.vue', fileContent, (err: any) => {
+//   if (err) {
+//     console.error(err)
+//   } else {
+//     console.log('文件创建成功！')
+//   }
+// })
+
+// fs.mkdirSync('./src/utils/yeahtest')
 
 const filePath = path.join(userDirectory!, 'chh')
 const filePathAddress = path.join(filePath, 'hostAddress.json')
