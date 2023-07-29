@@ -1,6 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import { type RouteRecordRaw } from 'vue-router'
+// import.meta.glob 是懒加载的模式，类似如下
+// let modules = {
+//   'xxx': ()=> import('xxx')
+// }
+// import.meta.globEager 是静态家在的模式, 类似如下
+// import xxx from 'xxx'
 
 const modules: any = import.meta.glob('./modules/**/*.ts', { eager: true })
 const routeModuleList: RouteRecordRaw[] = []
