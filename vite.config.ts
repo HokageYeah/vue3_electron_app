@@ -5,6 +5,7 @@ import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import { ElectronDevPlugin } from './plugins/vite.electron.dev'
 import { ElectronBuildPlugin } from './plugins/vite.electron.build'
+import electronRenderer from "vite-plugin-electron-renderer" 
 
 // 按需导入、自动导入插件
 import AutoImport from 'unplugin-auto-import/vite'
@@ -18,6 +19,7 @@ export default defineConfig({
     vueJsx(),
     ElectronDevPlugin(),
     ElectronBuildPlugin(),
+    electronRenderer(),
     AutoImport({
       resolvers: [ElementPlusResolver()]
     }),

@@ -1,5 +1,5 @@
 // electron主进程文件
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, ipcMain } from 'electron'
 import path from 'node:path'
 import fs from 'node:fs'
 app.whenReady().then(() => {
@@ -19,7 +19,14 @@ app.whenReady().then(() => {
       webSecurity: false // 禁用web安全策略（关闭跨域检查）
     }
   })
-  // win.webContents.openDevTools()
+  win.webContents.openDevTools()
+  ipcMain.on('openFlyCar', (event, message) => {
+    console.log('收到-----', message)
+    event.sender.send('flyCarResponse', `已收到消息${message}`);
+  })
+  setTimeout(() => {
+    win.webContents.send('message', { message: '初始化初始化' })
+  }, 5000)
   // if (process.platform === 'darwin') {
   //   app.dock.setIcon(path.join(__dirname, './dist/favicon.ico'))
   // }

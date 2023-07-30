@@ -11,6 +11,7 @@
       </el-table-column>
     </el-table>
   </div>
+  <el-button type="primary" size="small" @click="handleClickIpc()">点击传递消息</el-button>
   <HostEditDialog
     v-model:dialogVisible="dialogVisible"
     :dialogUrl="dialogUrl"
@@ -23,6 +24,7 @@ import { ref, onMounted, type Ref } from 'vue'
 import { fileReadSync, fileWriteSync, type dataItemType } from '@/utils/file_path'
 import HostEditDialog from './components/HostEditDialog.vue'
 import axios from 'axios'
+import { ipcRenderer } from 'electron'
 defineOptions({ name: 'ChangeHostView' })
 
 
@@ -63,6 +65,13 @@ onMounted(() => {
     .catch((err) => {
       console.error('读取时出错：', err)
     })
+    ipcRenderer.on('message', (event, message) => {
+      console.log('传递过来的信息----', message);
+    })
+
+    ipcRenderer.on('flyCarResponse', (event, data) => {
+      console.log('收到主进程的回复消息:', data);
+    });
 })
 
 const clickSure = (url: string) => {
@@ -84,6 +93,10 @@ const clickSure = (url: string) => {
       ElMessage.error(err)
     })
   console.log(tableData.value)
+}
+
+const handleClickIpc = () => {
+  ipcRenderer.send('openFlyCar', '打算大苏打')
 }
 
 </script>
