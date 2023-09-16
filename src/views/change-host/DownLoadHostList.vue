@@ -65,6 +65,9 @@ import { ref, onMounted, onUnmounted, nextTick, type Ref } from 'vue'
 import { Download } from '@element-plus/icons-vue'
 import { useDebounceFn } from '@vueuse/core'
 import { useRouter } from 'vue-router'
+import pathhaha from "node:path";
+const fileStr = pathhaha.join(filePathHosts, `ceshi.txt`)
+console.log('查看node内置模块----', fileStr);
 defineOptions({ name: 'DownLoadHostList' })
 let jsonObj: any = {}
 const tableData: Ref<dataItemType[]> = ref([])
