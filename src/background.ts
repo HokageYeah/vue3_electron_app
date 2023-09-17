@@ -40,7 +40,7 @@ app.whenReady().then(() => {
   } else {
     // 生产打包环境
     // win.loadFile('index.html')
-    // 最新打包
+    // 最新打包路径配置
     console.log('生产打包环境-------');
     CustomScheme.registerScheme();
     win.loadURL(`app://index.html`);
