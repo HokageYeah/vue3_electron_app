@@ -2,6 +2,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron'
 import path from 'node:path'
 import fs from 'node:fs'
+import { CustomScheme } from '../plugins/CustomScheme'
 app.whenReady().then(() => {
   const win = new BrowserWindow({
     height: 750,
@@ -34,10 +35,15 @@ app.whenReady().then(() => {
   console.log('process.argv', process.argv)
   if (process.argv[2]) {
     // 开发环境
+    console.log('开发环境-------');
     win.loadURL(process.argv[2])
   } else {
     // 生产打包环境
-    win.loadFile('index.html')
+    // win.loadFile('index.html')
+    // 最新打包路径配置
+    console.log('生产打包环境-------');
+    CustomScheme.registerScheme();
+    win.loadURL(`app://index.html`);
   }
 })
 
