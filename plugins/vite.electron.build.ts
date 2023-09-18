@@ -35,6 +35,12 @@ export const ElectronBuildPlugin = (): Plugin => {
       // 需要操作package.json文件
       const json = JSON.parse(fs.readFileSync('package.json', 'utf-8'))
       json.main = 'background.js'
+      // 新增代码
+      const electronConfig = json.devDependencies.electron.replace("^", "");
+      delete json.scripts;
+      delete json.devDependencies;
+      json.devDependencies = { electron: electronConfig };
+      // 新增代码
       fs.writeFileSync('dist/package.json', JSON.stringify(json, null, 4))
       console.log('打包了json----------------------', json)
       // bug electron-builder 他会给你下载垃圾文件
