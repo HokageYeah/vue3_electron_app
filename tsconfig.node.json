@@ -7,6 +7,8 @@
     "nightwatch.conf.*",
     "playwright.config.*",
     "plugins/**/*.ts",
+    "dev-build/**/*.ts",
+    "dev-build/vite/**/*.ts",
   ],
   "compilerOptions": {
     "composite": true,

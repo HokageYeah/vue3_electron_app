@@ -1,11 +1,11 @@
+import axios from 'axios'
 const path = require('node:path')
 const fs = require('node:fs')
-const os = require('os')
-import axios from 'axios'
+const os = require('node:os')
+const { exec } = require('node:child_process')
 const sudoPrompt = require('sudo-prompt')
-const { exec } = require('child_process')
 
-/** 
+/**
 process.env.HOME是 Linux 和 macOS 系统中用于表示用户主目录的环境变量，而在 Windows 上应使用 process.env.USERPROFILE 来获取用户主目录路径。
 然而，尽管process.env.USERPROFILE是正确的变量，但在使用 Electron 框架打包后，默认情况下不再具有这样的环境变量。因此，你需要使用其他方法来获取用户主目录路径。
 你可以尝试使用 Node.js 的 os 模块来获取用户主目录路径，
@@ -18,7 +18,7 @@ const crossPlatformPath = path.resolve(__dirname, './yeah_test.vue')
 
 console.log('__dirname-------', __dirname)
 console.log('currentFilePath-------', crossPlatformPath)
-debugger
+// debugger
 const fileContent = `<template>
   <div>
     你好我是模板
@@ -35,7 +35,7 @@ export default {
 <style scoped>
 /* 在这里编写样式内容 */
 </style>`
-debugger
+// debugger
 // fs.writeFile('./src/utils/yeah_test.vue', fileContent, (err: any) => {
 //   if (err) {
 //     console.error(err)
@@ -53,7 +53,7 @@ const filePathHosts = path.join(filePath, 'hosts')
 const fileReadSync = async (pathfile = filePathAddress) => {
   // eslint-disable-next-line no-async-promise-executor
   return new Promise<string>(async (resolve, reject) => {
-    debugger
+    // debugger
     if (fs.existsSync(pathfile)) {
       // const data = await fs.promises.readFile(pathfile);
       // console.log('的哈是多久撒朗读记录上----', data);
@@ -104,9 +104,9 @@ const downloadFile = async (url: string, pathName: string, callback: Function) =
   //   // 更新进度条或执行其他操作
   // });
 
-  debugger
+  // debugger
   return axios({
-    url: url,
+    url,
     method: 'GET',
     responseType: 'blob',
     onDownloadProgress: (progressEvent) => {
@@ -115,10 +115,10 @@ const downloadFile = async (url: string, pathName: string, callback: Function) =
     }
   })
     .then((response) => {
-      debugger
+      // debugger
       const blob = new Blob([response.data])
       const fileStr = path.join(filePathHosts, `${pathName}.txt`)
-      debugger
+      // debugger
       // 将数据写入本地文件
       const fileReader = new FileReader()
       fileReader.onload = async () => {
@@ -173,7 +173,7 @@ const addOrUpdateHostsEntry = (content: any, hostname: any, ipAddress: any) => {
   const lines = content.split('\n')
   let updatedContent = ''
   let entryUpdated = false
-  debugger
+  // debugger
   for (const line of lines) {
     if (line.trim().startsWith(ipAddress)) {
       // 如果已存在相同的 IP 地址，则更新主机名
@@ -183,7 +183,7 @@ const addOrUpdateHostsEntry = (content: any, hostname: any, ipAddress: any) => {
       updatedContent += `${line}\n`
     }
   }
-  debugger
+  // debugger
   if (!entryUpdated) {
     // 如果 hosts 文件中不存在相同的 IP 地址，则添加新条目
     updatedContent += `${ipAddress} ${hostname}\n`
@@ -234,7 +234,7 @@ function convertToEchoCommands(inputContent: string, filePath: string, issecond 
 
 // 中文编码
 const encodeChineseInString = (str: string) => {
-  const pattern = /[\u4e00-\u9fa5]+/g
+  const pattern = /[\u4E00-\u9FA5]+/g
   const matches = str.match(pattern)
 
   if (!matches) {
@@ -360,7 +360,7 @@ const updateHostsFile = (hostname: string, downloadedContent: any) => {
     })
 }
 
-type dataItemType = {
+interface dataItemType {
   name: string
   url: string
   isActive?: boolean

@@ -1,12 +1,13 @@
 // 开发环境的插件electron
-import type { AddressInfo } from 'net'
-import type { Plugin } from 'vite'
+import type { AddressInfo } from 'node:net'
 import { spawn } from 'node:child_process'
 import fs from 'node:fs'
+import type { Plugin } from 'vite'
 
 // 打包代码单独封装
 const buildBackground = () => {
   // 将background.ts文件编译成js文件
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   require('esbuild').buildSync({
     entryPoints: ['src/background.ts'],
     bundle: true,
@@ -34,6 +35,7 @@ export const ElectronDevPlugin = (): Plugin => {
         // require('electron')返回是一个路径
         // electron 是不认识ts文件，需要先进行编译成js文件
         // 进程传参法，发送给electron IP地址
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
         const electronStr = require('electron') as unknown as String
         console.log('electron的入口文件---------', electronStr)
         let electronProcess = spawn(<string>electronStr, ['dist/background.js', IP])
@@ -48,7 +50,7 @@ export const ElectronDevPlugin = (): Plugin => {
         })
         // 监听electron进程输出的日志
         electronProcess.stderr.on('data', (data) => {
-          console.log('data日志输出-----', data)
+          console.log('data日志输出-----', data.toString())
         })
         // 关闭窗口，主进程和子进程也会跟着退出
         electronProcess.on('close', () => {
@@ -87,8 +89,10 @@ export const getReplacer = () => {
       code: `const ${item} = require('${item}');export { ${item} as default }`
     })
   }
-  result['electron'] = () => {
-    const electronModules = ['clipboard', 'ipcRenderer', 'nativeImage', 'shell', 'webFrame'].join(',')
+  result.electron = () => {
+    const electronModules = ['clipboard', 'ipcRenderer', 'nativeImage', 'shell', 'webFrame'].join(
+      ','
+    )
     return {
       find: new RegExp(`^electron$`),
       code: `const {${electronModules}} = require('electron');export {${electronModules}}`

@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
 import { type RouteRecordRaw } from 'vue-router'
 // import.meta.glob 是懒加载的模式，类似如下
 // let modules = {
@@ -10,7 +9,7 @@ import { type RouteRecordRaw } from 'vue-router'
 
 const modules: any = import.meta.glob('./modules/**/*.ts', { eager: true })
 const routeModuleList: RouteRecordRaw[] = []
-// eslint-disable-next-line no-debugger
+
 // console.log(modules)
 Object.keys(modules).forEach((key) => {
   const mod = modules[key].default || {}
@@ -30,3 +29,4 @@ const router = createRouter({
 })
 
 export default router
+export { routeModuleList }

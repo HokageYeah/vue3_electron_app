@@ -23,18 +23,18 @@
                 <el-icon><Notebook /></el-icon>
                 <span>Host文件</span>
               </template>
-              <router-link to="/change-host">
+              <RouterLink to="/change-host">
                 <el-menu-item index="/change-host">Host链接</el-menu-item>
-              </router-link>
-              <router-link to="/down-load-host-list">
+              </RouterLink>
+              <RouterLink to="/down-load-host-list">
                 <el-menu-item index="/down-load-host-list">Host文件</el-menu-item>
-              </router-link>
+              </RouterLink>
             </el-sub-menu>
           </el-menu>
         </el-scrollbar>
       </div>
     </el-aside>
-    <el-main class="container-right"><router-view /> </el-main>
+    <el-main class="container-right"><RouterView /> </el-main>
   </el-container>
 
   <!-- <el-row class="tac">
@@ -89,8 +89,9 @@
 
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
-import { Document, Menu as IconMenu, Notebook, Setting } from '@element-plus/icons-vue'
+import { Notebook } from '@element-plus/icons-vue'
+const { permission } = useStore('permissionStore')
+console.log('permission', permission.value)
 
 const handleOpen = (key: string, keyPath: string[]) => {
   console.log(key, keyPath)
@@ -100,7 +101,7 @@ const handleClose = (key: string, keyPath: string[]) => {
 }
 </script>
 
-<style scoped lang="less">
+<style scoped lang="scss">
 // header {
 //   line-height: 1.5;
 //   max-height: 100vh;
@@ -239,7 +240,6 @@ const handleClose = (key: string, keyPath: string[]) => {
     }
   }
   &-right {
-    
   }
 }
 </style>

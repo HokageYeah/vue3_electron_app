@@ -1,7 +1,7 @@
 // electron主进程文件
-import { app, BrowserWindow, ipcMain } from 'electron'
 import path from 'node:path'
 import fs from 'node:fs'
+import { BrowserWindow, app, ipcMain } from 'electron'
 import { CustomScheme } from '../plugins/CustomScheme'
 app.whenReady().then(() => {
   const win = new BrowserWindow({
@@ -22,8 +22,8 @@ app.whenReady().then(() => {
   })
   win.webContents.openDevTools()
   ipcMain.on('openFlyCar', (event, message) => {
-    console.log('收到-----', message)
-    event.sender.send('flyCarResponse', `已收到消息${message}`);
+    console.log('收到------', message)
+    event.sender.send('flyCarResponse', `已收到消息${message}`)
   })
   setTimeout(() => {
     win.webContents.send('message', { message: '初始化初始化' })
@@ -31,19 +31,19 @@ app.whenReady().then(() => {
   // if (process.platform === 'darwin') {
   //   app.dock.setIcon(path.join(__dirname, './dist/favicon.ico'))
   // }
-  debugger
+  // debugger
   console.log('process.argv', process.argv)
   if (process.argv[2]) {
     // 开发环境
-    console.log('开发环境-------');
+    console.log('开发环境-------')
     win.loadURL(process.argv[2])
   } else {
     // 生产打包环境
     // win.loadFile('index.html')
     // 最新打包路径配置
-    console.log('生产打包环境-------');
-    CustomScheme.registerScheme();
-    win.loadURL(`app://index.html`);
+    console.log('生产打包环境--------')
+    CustomScheme.registerScheme()
+    win.loadURL(`app://index.html`)
   }
 })
 
@@ -107,7 +107,7 @@ const filePath = path.join(userDirectory!, 'chh')
 
 app.on('ready', async () => {
   //   const filePath = path.join(__dirname, 'hostAddress.json') // 文件路径，__dirname 表示当前文件所在目录
-  debugger
+  // debugger
   console.log('filePath-----', filePath)
 
   try {

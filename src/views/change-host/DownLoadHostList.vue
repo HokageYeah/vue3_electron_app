@@ -1,13 +1,14 @@
 <template>
-  <el-container class="layout-container-demo" style="height: 95vh;">
+  <el-container class="layout-container-demo" style="height: 95vh">
     <el-aside style="background-color: #e8eaed; border-right: 1px solid #c7cbd0" width="100px">
       <el-scrollbar>
         <el-space direction="vertical" style="width: 100%">
           <el-button
-            style="width: 100%"
-            :class="['button-click', { active: title == button.name }]"
             v-for="button in tableData"
             :key="button.name"
+            style="width: 100%"
+            class="button-click"
+            :class="[{ active: title == button.name }]"
             size="large"
             :type="buttonType(button.name)"
             link
@@ -24,11 +25,11 @@
           <span>{{ title }}</span>
           <el-button
             v-show="title !== '系统host'"
+            v-loading.fullscreen.lock="fullscreenLoading"
             :icon="Download"
             circle
             link
             @click="handleChange"
-            v-loading.fullscreen.lock="fullscreenLoading"
           >
           </el-button>
         </div>
@@ -51,23 +52,23 @@
 </template>
 
 <script setup lang="ts">
-import {
-  fileReadSync,
-  isFileExists,
-  downloadFile,
-  filePathHosts,
-  changeCurrent,
-  updateHostsFile,
-  readLocalHostsFile,
-  type dataItemType
-} from '@/utils/file_path'
-import { ref, onMounted, onUnmounted, nextTick, type Ref } from 'vue'
+import pathhaha from 'node:path'
+import { type Ref, onMounted, onUnmounted, ref } from 'vue'
 import { Download } from '@element-plus/icons-vue'
 import { useDebounceFn } from '@vueuse/core'
 import { useRouter } from 'vue-router'
-import pathhaha from "node:path";
+import {
+  changeCurrent,
+  type dataItemType,
+  downloadFile,
+  filePathHosts,
+  fileReadSync,
+  isFileExists,
+  readLocalHostsFile,
+  updateHostsFile
+} from '@/utils/file_path'
 const fileStr = pathhaha.join(filePathHosts, `ceshi.txt`)
-console.log('查看node内置模块----', fileStr);
+console.log('查看node内置模块----', fileStr)
 defineOptions({ name: 'DownLoadHostList' })
 let jsonObj: any = {}
 const tableData: Ref<dataItemType[]> = ref([])
@@ -106,14 +107,14 @@ const initData = () => {
     })
 }
 const buttonType = (name: string) => {
-  if(name == jsonObj.current && isfires) {
+  if (name == jsonObj.current && isfires) {
     btnClick(name)
     title.value = name
   }
   return name == jsonObj.current ? 'success' : ''
 }
 const btnClick = (name: string) => {
-  //取消上次延时未执行的方法
+  // 取消上次延时未执行的方法
   clearTimeout(time)
   time = setTimeout(() => {
     title.value = name
@@ -127,7 +128,7 @@ const btnClick = (name: string) => {
           console.error(err)
         })
     } else {
-      //do function在此处写单击事件要执行的代码
+      // do function在此处写单击事件要执行的代码
       isfires = false
       isNoEmpty.value = isFileExists(name)
       if (isNoEmpty.value) {
@@ -204,7 +205,8 @@ const formatText = (text: string) => {
   return formattedParts.join('')
 }
 </script>
-<style scoped lang="less">
+
+<style scoped lang="scss">
 .layout-container-demo {
   border: 1px solid #c7cbd0;
   // position: fixed;
