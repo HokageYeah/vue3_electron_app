@@ -2,15 +2,14 @@ import { type RouteRecordRaw } from 'vue-router'
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: '/',
-    redirect: '/change-host',
+    path: '/host-list',
     meta: {
       title: 'Host文件',
       icon: 'letter-h'
     },
     children: [
       {
-        path: 'change-host',
+        path: 'host-list',
         name: 'changeHost',
         component: () => import('@/views/change-host/ChangeHostView.vue'),
         meta: { title: 'Host链接' }

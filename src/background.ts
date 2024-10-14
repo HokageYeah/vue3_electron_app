@@ -1,7 +1,7 @@
 // electron主进程文件
 import path from 'node:path'
 import fs from 'node:fs'
-import { BrowserWindow, app, ipcMain } from 'electron'
+import { BrowserWindow, app, dialog, ipcMain } from 'electron'
 import { CustomScheme } from '../plugins/CustomScheme'
 app.whenReady().then(() => {
   const win = new BrowserWindow({
@@ -20,10 +20,21 @@ app.whenReady().then(() => {
       webSecurity: false // 禁用web安全策略（关闭跨域检查）
     }
   })
-  win.webContents.openDevTools()
+  // win.webContents.openDevTools()
   ipcMain.on('openFlyCar', (event, message) => {
     console.log('收到------', message)
     event.sender.send('flyCarResponse', `已收到消息${message}`)
+  })
+  // 吊起选择文件窗口
+  ipcMain.on('openFolderDialog', async (event, message) => {
+    const result = await dialog.showOpenDialog({
+      properties: ['openDirectory']
+    })
+    event.sender.send('folderPathChange', result.filePaths)
+    return result.filePaths
+  })
+  ipcMain.on('eventLog', async (event, message) => {
+    event.sender.send('eventLogVueProcess', message)
   })
   setTimeout(() => {
     win.webContents.send('message', { message: '初始化初始化' })

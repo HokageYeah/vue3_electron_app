@@ -12,22 +12,25 @@
             active-text-color="#ffd04b"
             background-color="#545c64"
             text-color="#fff"
-            default-active="/change-host"
-            :default-openeds="['/change-host']"
+            default-active="/app-list"
+            :default-openeds="['/app-list']"
             class="el-menu-vertical-demo"
             @open="handleOpen"
             @close="handleClose"
           >
-            <el-sub-menu index="1">
+            <el-sub-menu v-for="(item, index) in routes" :key="item.path" :index="`${index + 1}`">
               <template #title>
                 <el-icon><Notebook /></el-icon>
-                <span>Host文件</span>
+                <span>{{ item.meta?.title }}</span>
               </template>
-              <RouterLink to="/change-host">
-                <el-menu-item index="/change-host">Host链接</el-menu-item>
-              </RouterLink>
-              <RouterLink to="/down-load-host-list">
-                <el-menu-item index="/down-load-host-list">Host文件</el-menu-item>
+              <RouterLink
+                v-for="subItem in item.children"
+                :key="subItem.path"
+                :to="`${item.path === '/' ? item.path  : item.path+'/'}${subItem.path}`"
+              >
+                <el-menu-item :index="`${item.path === '/' ? item.path  : item.path+'/'}${subItem.path}`">{{
+                  subItem.meta?.title
+                }}</el-menu-item>
               </RouterLink>
             </el-sub-menu>
           </el-menu>
@@ -90,8 +93,8 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
 import { Notebook } from '@element-plus/icons-vue'
-const { permission } = useStore('permissionStore')
-console.log('permission', permission.value)
+const { routes } = useStore('permissionStore')
+console.log('routes', routes.value)
 
 const handleOpen = (key: string, keyPath: string[]) => {
   console.log(key, keyPath)
